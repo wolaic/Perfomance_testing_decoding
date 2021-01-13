@@ -89,8 +89,8 @@ int main(void)
   /* 通用定时器初始化并配置输入捕获功能 */
   GENERAL_TIMx_Init();
   
-  printf ( "STM32 输入捕获实验\n" );
-	printf ( "按下KEY1，测试KEY1按下的时间\n" );
+  printf ( "STM32 Test Start\n" );
+
 
   /* 获取定时器时钟周期 */	
 	ulTmrClk = HAL_RCC_GetHCLKFreq()/GENERAL_TIM_PRESCALER;    
@@ -101,14 +101,19 @@ int main(void)
   
   /* 无限循环 */
   while (1)
-  {
+  {	
+		HAL_GPIO_WritePin(GPIOG,GPIO_PIN_7,GPIO_PIN_SET);
+		
+		HAL_GPIO_WritePin(GPIOG,GPIO_PIN_7,GPIO_PIN_RESET);
+		
+		HAL_GPIO_WritePin(GPIOG,GPIO_PIN_7,GPIO_PIN_SET);
     /* 完成测量高电平脉宽 */
     if(strCapture.ucFinishFlag == 1 )
 		{
       /* 计算高电平计数值 */
 			ulTime = strCapture .usPeriod * GENERAL_TIM_PERIOD + strCapture .usCtr;
 			/* 打印高电平脉宽时间 */
-			printf ( ">>测得高电平脉宽时间：%d.%d s\n", ulTime / ulTmrClk, ulTime % ulTmrClk ); 
+			printf ( ">>decoding time:%d.%d s\n", ulTime / ulTmrClk, ulTime % ulTmrClk ); 
 			strCapture .ucFinishFlag = 0;			
 		}
   }
@@ -144,7 +149,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     strCapture .usCtr = 0;
     
     // 配置输入捕获参数，主要是修改触发电平
-    sConfigIC.ICPolarity = GENERAL_TIM_END_ICPolarity;
+    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
     sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
     sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
     sConfigIC.ICFilter = 0;
@@ -152,7 +157,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     // 清除中断标志位
     __HAL_TIM_CLEAR_IT(htim, GENERAL_TIM_IT_CCx);
     // 启动输入捕获并开启中断
-    HAL_TIM_IC_Start_IT(&htimx,GENERAL_TIM_CHANNELx);    
+    HAL_TIM_IC_Start_IT(&htimx,TIM_CHANNEL_2);    
     strCapture .ucStartFlag = 1;			
   }		
   
@@ -161,16 +166,16 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     LED1_TOGGLE;
     
     // 获取定时器计数值
-    strCapture .usCtr = HAL_TIM_ReadCapturedValue(&htimx,GENERAL_TIM_CHANNELx);
+    strCapture .usCtr = HAL_TIM_ReadCapturedValue(&htimx,TIM_CHANNEL_2);
     // 配置输入捕获参数，主要是修改触发电平
-    sConfigIC.ICPolarity = GENERAL_TIM_STRAT_ICPolarity;
+    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
     sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
     sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
     sConfigIC.ICFilter = 0;
-    HAL_TIM_IC_ConfigChannel(&htimx, &sConfigIC, GENERAL_TIM_CHANNELx);
+    HAL_TIM_IC_ConfigChannel(&htimx, &sConfigIC, TIM_CHANNEL_2);
     
     // 清除中断标志位
-    __HAL_TIM_CLEAR_IT(htim, GENERAL_TIM_IT_CCx); 
+    __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC2); 
     // 启动输入捕获并开启中断
     HAL_TIM_IC_Start_IT(&htimx,GENERAL_TIM_CHANNELx);    
     strCapture .ucStartFlag = 0;			

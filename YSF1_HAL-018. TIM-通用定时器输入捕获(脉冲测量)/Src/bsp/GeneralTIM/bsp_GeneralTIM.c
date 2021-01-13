@@ -56,6 +56,12 @@ void GENERAL_TIMx_Init(void)
   sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
   sConfigIC.ICFilter = 0;
   HAL_TIM_IC_ConfigChannel(&htimx, &sConfigIC, GENERAL_TIM_CHANNELx);
+	
+	sConfigIC.ICPolarity = GENERAL_TIM_STRAT_ICPolarity;
+  sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
+  sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
+  sConfigIC.ICFilter = 0;
+  HAL_TIM_IC_ConfigChannel(&htimx, &sConfigIC, TIM_CHANNEL_2);
 }
 
 /**
@@ -74,7 +80,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
     
     KEY1_RCC_CLK_ENABLE();
     
-    GPIO_InitStruct.Pin = KEY1_GPIO_PIN;
+    GPIO_InitStruct.Pin = KEY1_GPIO_PIN|GPIO_PIN_1;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_PULLDOWN;
     HAL_GPIO_Init(KEY1_GPIO, &GPIO_InitStruct);
@@ -99,7 +105,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
     /* 基本定时器外设时钟禁用 */
     GENERAL_TIM_RCC_CLK_DISABLE();
     
-    HAL_GPIO_DeInit(KEY1_GPIO, KEY1_GPIO_PIN);
+    HAL_GPIO_DeInit(KEY1_GPIO, KEY1_GPIO_PIN|GPIO_PIN_1);
     
     /* 禁用定时器中断 */
     HAL_NVIC_DisableIRQ(GENERAL_TIM_IRQn);

@@ -36,7 +36,7 @@ typedef struct              //测量高电平脉宽
 #define GENERAL_TIM_PERIOD                  0xFFFF
 
 #define GENERAL_TIM_STRAT_ICPolarity        TIM_INPUTCHANNELPOLARITY_RISING          //测量的起始边沿
-#define GENERAL_TIM_END_ICPolarity          TIM_INPUTCHANNELPOLARITY_RISING        //测量的结束边沿
+#define GENERAL_TIM_END_ICPolarity          TIM_INPUTCHANNELPOLARITY_FALLING         //测量的结束边沿
 
 /* 扩展变量 ------------------------------------------------------------------*/
 extern TIM_HandleTypeDef htimx;
